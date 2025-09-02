@@ -1,5 +1,7 @@
 # Simple Makefile for Estimation Poker
 GO ?= go
+GOFLAGS ?=
+ENVVARS := GOCACHE=$(CURDIR)/tmp/gocache GOTMPDIR=$(CURDIR)/tmp
 
 # --- capture extra words after the target as the commit message ---
 # e.g. make pushall "my new commit"
@@ -9,24 +11,24 @@ MSG  ?= $(if $(strip $(ARGS)),$(ARGS),update)
 .PHONY: run dev build test fmt tidy clean tools pushall
 
 run:
-	$(GO) run ./cmd/server
+	$(ENVVARS) $(GO) run $(GOFLAGS) ./cmd/server
 
 # Requires: go install github.com/air-verse/air@latest
 dev:
 	air
 
 build:
-	$(GO) build -o bin/server ./cmd/server
+	$(ENVVARS) $(GO) build $(GOFLAGS) -o bin/server ./cmd/server
 
 test:
-	$(GO) test ./... -count=1
+	$(ENVVARS) $(GO) test $(GOFLAGS) ./... -count=1
 
 fmt:
-	$(GO) fmt ./...
-	$(GO) vet ./...
+	$(ENVVARS) $(GO) fmt $(GOFLAGS) ./...
+	$(ENVVARS) $(GO) vet $(GOFLAGS) ./...
 
 tidy:
-	$(GO) mod tidy
+	$(ENVVARS) $(GO) mod tidy $(GOFLAGS)
 
 clean:
 	rm -rf bin tmp

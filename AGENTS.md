@@ -10,6 +10,8 @@ No persistence: **in-memory** only (ephemeral).
 Repo: https://github.com/jaminalder/estimations  
 Module path: **github.com/jaminalder/estimations**  
 Dev: `air` auto-reload.
+  
+Domain: see `DOMAIN.md` for the authoritative model.
 
 ## Workflow (must follow)
 1) Plan: restate the feature + acceptance criteria.  
@@ -65,12 +67,8 @@ Include in `web/templates/layouts/base.tmpl.html`:
 
 ## Current priorities (Now/Next/Later)
 - **Now:** Design and implement the domain
-- **Next:** Create/Join room, pick deck, cast vote, reveal/hide, reset (SSR + htmx).  
-- **Next:** SSE broadcasts for join/leave/vote/reveal; room page updates live.  
-- **Later:** Export results; persistence; ownership/admin.
 
 ## Key decisions (brief)
 - DDD-lite + ports/adapters; **in-memory** repo for v1.  
 - **SSR** pages, progressively enhanced with htmx; **Bulma** styling.  
 - **SSE** over WebSockets (simplicity).
-
