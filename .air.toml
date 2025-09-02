@@ -1,0 +1,14 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/server ./cmd/server"
+bin = "./tmp/server"
+include_ext = ["go", "tmpl", "html"]
+exclude_dir = ["tmp", "vendor", "docs", "bin"]
+
+[log]
+time = true
+
+[screen]
+clear_on_rebuild = true
