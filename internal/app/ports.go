@@ -7,7 +7,7 @@ import (
     "github.com/jaminalder/estimations/internal/domain"
 )
 
-// RoomRepo is an in-memory repository interface for Room aggregates.
+// RoomRepo is the repository interface for Room aggregates.
 type RoomRepo interface {
     Create(ctx context.Context, room *domain.Room) error
     Get(ctx context.Context, id domain.RoomID) (*domain.Room, bool, error)
@@ -29,4 +29,3 @@ type Clock interface {
 type Broadcaster interface {
     Broadcast(ctx context.Context, roomID domain.RoomID, event any) error
 }
-
