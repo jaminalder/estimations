@@ -2,6 +2,7 @@
 GO ?= go
 GOFLAGS ?=
 ENVVARS := GOCACHE=$(CURDIR)/tmp/gocache GOTMPDIR=$(CURDIR)/tmp
+TESTFLAGS ?= -v
 
 # --- capture extra words after the target as the commit message ---
 # e.g. make pushall "my new commit"
@@ -21,7 +22,7 @@ build:
 	$(ENVVARS) $(GO) build $(GOFLAGS) -o bin/server ./cmd/server
 
 test:
-	$(ENVVARS) $(GO) test $(GOFLAGS) ./... -count=1
+	$(ENVVARS) $(GO) test $(GOFLAGS) ./... -count=1 $(TESTFLAGS)
 
 fmt:
 	$(ENVVARS) $(GO) fmt $(GOFLAGS) ./...

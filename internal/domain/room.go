@@ -22,6 +22,7 @@ type Room struct {
     names        map[string]ParticipantID // lowercase name → ID
     votes        map[ParticipantID]string // current round votes
     state        roundState
+    round        int // increments on each Reset
 }
 
 func NewRoom(id RoomID) *Room {
@@ -31,6 +32,7 @@ func NewRoom(id RoomID) *Room {
         names:        make(map[string]ParticipantID),
         votes:        make(map[ParticipantID]string),
         state:        stateVoting,
+        round:        0,
     }
 }
 
@@ -89,5 +91,43 @@ func (r *Room) Reveal() error {
         return errors.New("cannot reveal: no votes")
     }
     r.state = stateRevealed
+    return nil
+}
+
+// Reset starts a new round: clears all votes and re-opens voting.
+func (r *Room) Reset() error {
+    r.votes = make(map[ParticipantID]string)
+    r.state = stateVoting
+    r.round++
+    return nil
+}
+
+// RoundIndex returns the current round index, starting at 0.
+func (r *Room) RoundIndex() int { return r.round }
+
+// ClearVote clears a participant's current vote in Voting state.
+func (r *Room) ClearVote(id ParticipantID) error {
+    if r.state != stateVoting {
+        return errors.New("voting is closed")
+    }
+    if _, ok := r.participants[id]; !ok {
+        return errors.New("not a participant")
+    }
+    delete(r.votes, id)
+    return nil
+}
+
+// Leave removes a participant from the room and clears any vote.
+func (r *Room) Leave(id ParticipantID) error {
+    p, ok := r.participants[id]
+    if !ok {
+        return errors.New("not a participant")
+    }
+    // Remove vote if present
+    delete(r.votes, id)
+    // Remove name index and participant record
+    key := strings.ToLower(strings.TrimSpace(p.Name))
+    delete(r.names, key)
+    delete(r.participants, id)
     return nil
 }
