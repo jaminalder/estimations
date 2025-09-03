@@ -4,5 +4,5 @@ package app
 type Service struct {
     Rooms RoomRepo
     Ids   IdGen
+    Bus   Broadcaster
 }
-
