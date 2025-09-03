@@ -65,9 +65,6 @@ Include in `web/templates/layouts/base.tmpl.html`:
 - htmx: `https://unpkg.com/htmx.org@1.9.12`
 - Alpine: `https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js`
 
-## Current priorities (Now/Next/Later)
-- **Now:** Design and implement the domain
-
 ## Key decisions (brief)
 - DDD-lite + ports/adapters; **in-memory** repo for v1.  
 - **SSR** pages, progressively enhanced with htmx; **Bulma** styling.  
