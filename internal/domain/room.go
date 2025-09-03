@@ -36,6 +36,9 @@ func NewRoom(id RoomID) *Room {
     }
 }
 
+// ID returns the room's identifier.
+func (r *Room) ID() RoomID { return r.id }
+
 // Join adds a participant with the given ID and display name.
 // Name must be unique within the room (case-insensitive) and non-empty after trim.
 func (r *Room) Join(id ParticipantID, name string) error {
@@ -63,8 +66,18 @@ const (
 )
 
 var allowedCards = map[string]struct{}{
-    "0": {}, "1": {}, "2": {}, "3": {}, "5": {}, "8": {}, "13": {}, "21": {}, "34": {},
-    "?": {}, "∞": {}, "☕": {}, "Pass": {},
+    // initialized from deckV1 in init
+}
+
+// deckV1 is the immutable v1 deck (order matters for UI rendering).
+var deckV1 = []string{"0", "1", "2", "3", "5", "8", "13", "21", "34", "?", "∞", "☕", "Pass"}
+
+func init() {
+    // Build the allowedCards set from the deck
+    allowedCards = make(map[string]struct{}, len(deckV1))
+    for _, c := range deckV1 {
+        allowedCards[c] = struct{}{}
+    }
 }
 
 // CastVote records a participant's vote while in Voting state.
@@ -130,4 +143,32 @@ func (r *Room) Leave(id ParticipantID) error {
     delete(r.names, key)
     delete(r.participants, id)
     return nil
+}
+
+// Participants returns a snapshot slice of current participants.
+func (r *Room) Participants() []Participant {
+    out := make([]Participant, 0, len(r.participants))
+    for _, p := range r.participants {
+        out = append(out, p)
+    }
+    return out
+}
+
+// IsRevealed reports whether the current round is revealed.
+func (r *Room) IsRevealed() bool { return r.state == stateRevealed }
+
+// Votes returns a copy of the current votes map.
+func (r *Room) Votes() map[ParticipantID]string {
+    out := make(map[ParticipantID]string, len(r.votes))
+    for k, v := range r.votes {
+        out[k] = v
+    }
+    return out
+}
+
+// Deck returns the immutable v1 deck in display order.
+func (r *Room) Deck() []string {
+    out := make([]string, len(deckV1))
+    copy(out, deckV1)
+    return out
 }
