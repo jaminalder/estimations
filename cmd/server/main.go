@@ -28,7 +28,7 @@ func main() {
     if err != nil {
         log.Fatalf("templates: %v", err)
     }
-    handler := httpadapter.NewServer(svc, rend)
+    handler := httpadapter.NewServer(svc, rend, httpadapter.WithLogger(log.Default()))
 
     srv := &http.Server{
         Addr:    ":8080",

@@ -5,15 +5,16 @@
 {{ define "title" }}Lobby · Estimations{{ end }}
 
 {{ define "content" }}
-  <div class="box story-card mt-5">
-    <div class="content">
-      <div class="field">
-        <input class="input is-large has-text-centered" type="text" placeholder="Your name">
+  <form action="/rooms/{{.RoomID}}/join" method="post">
+    <div class="box story-card mt-5">
+      <div class="content">
+        <div class="field">
+          <input class="input is-large has-text-centered" type="text" name="name" placeholder="Your name">
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="has-text-centered">
-    <a href="/room" class="button is-primary is-large">Enter Room</a>
-  </div>
+    <div class="has-text-centered">
+      <button type="submit" class="button is-primary is-large">Enter Room</button>
+    </div>
+  </form>
 {{ end }}

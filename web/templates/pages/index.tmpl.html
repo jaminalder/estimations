@@ -5,15 +5,16 @@
 {{ define "title" }}Create Room · Estimations{{ end }}
 
 {{ define "content" }}
-  <div class="box story-card mt-5">
-    <div class="content">
-      <div class="field">
-        <input class="input is-large has-text-centered" type="text" placeholder="Session Title" value="Session Title">
+  <form action="/rooms" method="post">
+    <div class="box story-card mt-5">
+      <div class="content">
+        <div class="field">
+          <input class="input is-large has-text-centered" type="text" name="title" placeholder="Session Title">
+        </div>
       </div>
     </div>
-  </div>
-
-  <div class="has-text-centered">
-    <a href="/lobby" class="button is-primary is-large">Create Room</a>
-  </div>
+    <div class="has-text-centered">
+      <button type="submit" class="button is-primary is-large">Create Room</button>
+    </div>
+  </form>
 {{ end }}

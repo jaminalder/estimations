@@ -40,6 +40,7 @@
 .card-deck .poker-card {
   margin-bottom: 1rem;
 }
+
 .has-background-dynamic {
   background-color: var(--my-background) !important;
 }
@@ -50,4 +51,3 @@
 }
 html.theme-light { --my-background: hsl(0, 0%, 96%); }
 html.theme-dark { --my-background: hsl(0, 0%, 21%); }
-

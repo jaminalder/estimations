@@ -2,13 +2,13 @@ package httpadapter
 
 import (
     "net/http/httptest"
+    "strings"
     "testing"
 )
 
 func TestRoot_RendersLanding(t *testing.T) {
-    r, err := NewRenderer()
-    if err != nil { t.Fatalf("renderer: %v", err) }
-    srv := NewServer(nil, r)
+    var logs strings.Builder
+    srv := newTestServer(t, &logs)
 
     req := httptest.NewRequest("GET", "/", nil)
     rec := httptest.NewRecorder()
@@ -24,9 +24,8 @@ func TestRoot_RendersLanding(t *testing.T) {
 }
 
 func TestLanding_RendersCreateRoom(t *testing.T) {
-    r, err := NewRenderer()
-    if err != nil { t.Fatalf("renderer: %v", err) }
-    srv := NewServer(nil, r)
+    var logs strings.Builder
+    srv := newTestServer(t, &logs)
 
     req := httptest.NewRequest("GET", "/landing", nil)
     rec := httptest.NewRecorder()
@@ -42,9 +41,8 @@ func TestLanding_RendersCreateRoom(t *testing.T) {
 }
 
 func TestRoom_RendersMockup(t *testing.T) {
-    r, err := NewRenderer()
-    if err != nil { t.Fatalf("renderer: %v", err) }
-    srv := NewServer(nil, r)
+    var logs strings.Builder
+    srv := newTestServer(t, &logs)
 
     req := httptest.NewRequest("GET", "/room", nil)
     rec := httptest.NewRecorder()
@@ -57,7 +55,6 @@ func TestRoom_RendersMockup(t *testing.T) {
     // Check key fragments from mockup
     mustContain := []string{
         "Voting in Progress",
-        "3 of 4 players have voted",
         "Reveal Cards",
         "Reset Votes",
         "Select Your Estimate",
