@@ -2,10 +2,18 @@
 {{ template "base" . }}
 {{ end }}
 
-{{ define "title" }}Hello · Estimations{{ end }}
+{{ define "title" }}Create Room · Estimations{{ end }}
 
 {{ define "content" }}
-<h1 class="title">Hello, Estimations!</h1>
-<p class="subtitle">Minimal index page is alive.</p>
-{{ end }}
+  <div class="box story-card mt-5">
+    <div class="content">
+      <div class="field">
+        <input class="input is-large has-text-centered" type="text" placeholder="Session Title" value="Session Title">
+      </div>
+    </div>
+  </div>
 
+  <div class="has-text-centered">
+    <a href="/lobby" class="button is-primary is-large">Create Room</a>
+  </div>
+{{ end }}

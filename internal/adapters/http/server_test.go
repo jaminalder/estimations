@@ -5,7 +5,7 @@ import (
     "testing"
 )
 
-func TestIndex_RendersHello(t *testing.T) {
+func TestRoot_RendersLanding(t *testing.T) {
     r, err := NewRenderer()
     if err != nil { t.Fatalf("renderer: %v", err) }
     srv := NewServer(nil, r)
@@ -18,8 +18,54 @@ func TestIndex_RendersHello(t *testing.T) {
         t.Fatalf("status: got %d want 200", rec.Code)
     }
     body := rec.Body.String()
-    if body == "" || !contains(body, "Hello") {
-        t.Fatalf("body should contain 'Hello', got: %q", body)
+    if body == "" || !contains(body, "Create Room") || !contains(body, "Session Title") {
+        t.Fatalf("body should contain landing elements, got: %q", body)
+    }
+}
+
+func TestLanding_RendersCreateRoom(t *testing.T) {
+    r, err := NewRenderer()
+    if err != nil { t.Fatalf("renderer: %v", err) }
+    srv := NewServer(nil, r)
+
+    req := httptest.NewRequest("GET", "/landing", nil)
+    rec := httptest.NewRecorder()
+    srv.ServeHTTP(rec, req)
+
+    if rec.Code != 200 {
+        t.Fatalf("status: got %d want 200", rec.Code)
+    }
+    body := rec.Body.String()
+    if body == "" || !contains(body, "Create Room") || !contains(body, "Session Title") {
+        t.Fatalf("body should contain landing elements, got: %q", body)
+    }
+}
+
+func TestRoom_RendersMockup(t *testing.T) {
+    r, err := NewRenderer()
+    if err != nil { t.Fatalf("renderer: %v", err) }
+    srv := NewServer(nil, r)
+
+    req := httptest.NewRequest("GET", "/room", nil)
+    rec := httptest.NewRecorder()
+    srv.ServeHTTP(rec, req)
+
+    if rec.Code != 200 {
+        t.Fatalf("status: got %d want 200", rec.Code)
+    }
+    body := rec.Body.String()
+    // Check key fragments from mockup
+    mustContain := []string{
+        "Voting in Progress",
+        "3 of 4 players have voted",
+        "Reveal Cards",
+        "Reset Votes",
+        "Select Your Estimate",
+    }
+    for _, sub := range mustContain {
+        if !contains(body, sub) {
+            t.Fatalf("body should contain %q, got: %q", sub, body)
+        }
     }
 }
 

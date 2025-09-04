@@ -6,10 +6,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ block "title" . }}Estimations{{ end }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@latest/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/app.css">
     <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="/static/app.js" defer></script>
   </head>
   <body>
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/">
+            <span class="has-text-weight-bold has-text-white">Estimations</span>
+          </a>
+        </div>
+        <div class="navbar-menu">
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="dropdown is-right" id="themeDropdown">
+                <div class="dropdown-trigger">
+                  <button class="button is-light" aria-haspopup="true" aria-controls="theme-menu" id="themeButton" type="button">
+                    <span class="icon"><i class="fa-solid fa-palette"></i></span>
+                    <span id="themeLabel">System</span>
+                    <span class="icon is-small" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" id="theme-menu" role="menu">
+                  <div class="dropdown-content">
+                    <a href="#" class="dropdown-item" data-theme="light">
+                      <span class="icon"><i class="fa-solid fa-sun"></i></span>
+                      <span>Light</span>
+                    </a>
+                    <a href="#" class="dropdown-item" data-theme="dark">
+                      <span class="icon"><i class="fa-solid fa-moon"></i></span>
+                      <span>Dark</span>
+                    </a>
+                    <a href="#" class="dropdown-item" data-theme="system">
+                      <span class="icon"><i class="fa-solid fa-desktop"></i></span>
+                      <span>System</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
     <section class="section">
       <div class="container">
         {{ block "content" . }}{{ end }}
@@ -18,4 +60,3 @@
   </body>
   </html>
 {{ end }}
-

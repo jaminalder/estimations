@@ -1,0 +1,19 @@
+{{ define "lobby" }}
+{{ template "base" . }}
+{{ end }}
+
+{{ define "title" }}Lobby · Estimations{{ end }}
+
+{{ define "content" }}
+  <div class="box story-card mt-5">
+    <div class="content">
+      <div class="field">
+        <input class="input is-large has-text-centered" type="text" placeholder="Your name">
+      </div>
+    </div>
+  </div>
+
+  <div class="has-text-centered">
+    <a href="/room" class="button is-primary is-large">Enter Room</a>
+  </div>
+{{ end }}

@@ -4,7 +4,7 @@ _Last updated: 2025-09-02_
 
 ## Project
 Interactive estimation poker for Scrum teams.  
-Stack: **Go 1.25**, chi, server-side rendered multipage app, htmx, Alpine.js, Bulma, **SSE**.  
+Stack: **Go 1.25**, chi, server-side rendered multipage app, htmx, Bulma, **SSE**.  
 No auth/login: users type a display name, create a room, share the URL.  
 No persistence: **in-memory** only (ephemeral).  
 Repo: https://github.com/jaminalder/estimations  
@@ -41,7 +41,7 @@ Domain: see `DOMAIN.md` for the authoritative model.
 ## Coding rules
 - Domain stays **pure** (stdlib only).  
 - Use **ports** in `internal/app/ports.go`; adapters implement them.  
-- SSR first; **htmx** for partial swaps; **Alpine** for tiny local state.  
+- SSR first; **htmx** for partial swaps; vanilla JS for small interactions.  
 - **SSE** for realtime room events (join/leave/vote/reveal/reset).  
 - Pass deps via constructors; no global state.  
 - Errors: wrap with context; no panics in request path.
@@ -63,7 +63,6 @@ Domain: see `DOMAIN.md` for the authoritative model.
 Include in `web/templates/layouts/base.tmpl.html`:
 - Bulma: `https://cdn.jsdelivr.net/npm/bulma@latest/css/bulma.min.css`
 - htmx: `https://unpkg.com/htmx.org@1.9.12`
-- Alpine: `https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js`
 
 ## Key decisions (brief)
 - DDD-lite + ports/adapters; **in-memory** repo for v1.  
