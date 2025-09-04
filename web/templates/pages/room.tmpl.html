@@ -28,27 +28,37 @@
       {{ range .Participants }}
       <div class="column is-narrow has-text-centered">
         <div class="mb-3">
-          <span class="icon is-large">
+          <span class="icon is-large {{ if .IsYou }}has-text-primary{{ end }}">
             <i class="fas fa-user fa-2x"></i>
           </span>
           <p class="title is-6 mt-2">{{ .Name }}</p>
         </div>
         <div class="poker-card {{ if .HasVoted }}has-background-primary has-text-white{{ else }}has-background-grey-lighter has-text-grey{{ end }}">
-          {{ if .HasVoted }}?{{ else }}<i class="fas fa-clock"></i>{{ end }}
+          {{ if $.Revealed }}{{ if .HasVoted }}{{ .Card }}{{ else }}–{{ end }}{{ else }}{{ if .HasVoted }}?{{ else }}<i class="fas fa-clock"></i>{{ end }}{{ end }}
         </div>
       </div>
       {{ end }}
     </div>
 
     <div class="has-text-centered mt-4" id="actions">
-      <button class="button is-success is-large" id="voteButton" disabled>
-        <span class="icon"><i class="fas fa-eye"></i></span>
-        <span>Reveal Cards</span>
-      </button>
-      <button class="button is-light is-large ml-2">
-        <span class="icon"><i class="fas fa-redo"></i></span>
-        <span>Reset Votes</span>
-      </button>
+      <form method="post" action="/rooms/{{ .RoomID }}/reveal" style="display:inline-block">
+        <button class="button is-success is-large" id="voteButton">
+          <span class="icon"><i class="fas fa-eye"></i></span>
+          <span>Reveal Cards</span>
+        </button>
+      </form>
+      <form method="post" action="/rooms/{{ .RoomID }}/reset" style="display:inline-block">
+        <button class="button is-light is-large ml-2">
+          <span class="icon"><i class="fas fa-redo"></i></span>
+          <span>Reset Votes</span>
+        </button>
+      </form>
+      <form method="post" action="/rooms/{{ .RoomID }}/clear" style="display:inline-block">
+        <button class="button is-light is-large ml-2">
+          <span class="icon"><i class="fas fa-eraser"></i></span>
+          <span>Clear Vote</span>
+        </button>
+      </form>
     </div>
   </div>
 
@@ -61,7 +71,10 @@
 
     <div class="card-deck">
       {{ range .Deck }}
-      <div class="poker-card has-background-white has-text-dark has-border">{{ . }}</div>
+      <form method="post" action="/rooms/{{ $.RoomID }}/cast">
+        <input type="hidden" name="card" value="{{ . }}">
+        <button type="submit" class="poker-card has-background-white has-text-dark has-border">{{ . }}</button>
+      </form>
       {{ end }}
     </div>
   </div>

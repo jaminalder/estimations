@@ -48,6 +48,10 @@ func newRouter(h *Handler, opts ...Option) http.Handler {
 		r.Get("/lobby", h.Lobby)
 		r.Post("/join", h.Join)
 		r.Get("/", h.Room)
+		r.Post("/cast", h.Cast)
+		r.Post("/clear", h.Clear)
+		r.Post("/reveal", h.Reveal)
+		r.Post("/reset", h.Reset)
 	})
 
 	// Fallbacks for legacy mockup routes

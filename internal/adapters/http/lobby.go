@@ -17,12 +17,22 @@ func (h *Handler) Lobby(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if h.svc != nil {
-		if _, ok, err := h.svc.Rooms.Get(r.Context(), domain.RoomID(roomID)); err != nil {
+		room, ok, err := h.svc.Rooms.Get(r.Context(), domain.RoomID(roomID))
+		if err != nil {
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		} else if !ok {
 			http.NotFound(w, r)
 			return
+		}
+		// If already joined (cookie pid present and matches a participant), redirect to room.
+		if pid := h.readPID(r); pid != "" {
+			for _, p := range room.Participants() {
+				if string(p.ID) == pid {
+					http.Redirect(w, r, "/rooms/"+roomID, http.StatusSeeOther)
+					return
+				}
+			}
 		}
 	}
 	data := struct{ RoomID string }{RoomID: roomID}
@@ -49,9 +59,29 @@ func (h *Handler) Join(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "service unavailable", http.StatusInternalServerError)
 		return
 	}
-	if _, err := h.svc.Join(r.Context(), domain.RoomID(roomID), name); err != nil {
+	// If already has a participant cookie for this room, just go to the room.
+	if pid := h.readPID(r); pid != "" {
+		if room, ok, _ := h.svc.Rooms.Get(r.Context(), domain.RoomID(roomID)); ok {
+			for _, p := range room.Participants() {
+				if string(p.ID) == pid {
+					http.Redirect(w, r, "/rooms/"+roomID, http.StatusSeeOther)
+					return
+				}
+			}
+		}
+	}
+	pid, err := h.svc.Join(r.Context(), domain.RoomID(roomID), name)
+	if err != nil {
 		http.Error(w, "join failed", http.StatusBadRequest)
 		return
 	}
+	// Scope participant cookie to this room path so multiple rooms don't collide.
+	http.SetCookie(w, &http.Cookie{
+		Name:     "pid",
+		Value:    string(pid),
+		Path:     "/rooms/" + roomID,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 	http.Redirect(w, r, "/rooms/"+roomID, http.StatusSeeOther)
 }

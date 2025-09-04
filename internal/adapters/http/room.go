@@ -31,14 +31,17 @@ func (h *Handler) Room(w http.ResponseWriter, r *http.Request) {
 	}
 
 	votes := room.Votes()
+	me := h.readPID(r)
 	type participantVM struct {
 		Name     string
 		HasVoted bool
+		Card     string
+		IsYou    bool
 	}
 	pvs := make([]participantVM, 0, len(room.Participants()))
 	for _, p := range room.Participants() {
-		_, has := votes[p.ID]
-		pvs = append(pvs, participantVM{Name: p.Name, HasVoted: has})
+		card, has := votes[p.ID]
+		pvs = append(pvs, participantVM{Name: p.Name, HasVoted: has, Card: card, IsYou: string(p.ID) == me})
 	}
 	data := struct {
 		RoomID       string

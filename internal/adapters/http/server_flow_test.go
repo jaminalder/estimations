@@ -156,3 +156,93 @@ func TestLobby_Join_RedirectsToRoom_AndLogs(t *testing.T) {
 		t.Fatalf("room page content missing participant/deck, got: %q", body)
 	}
 }
+
+func TestRoom_CastClearFlow_WithPidCookie(t *testing.T) {
+	var logs strings.Builder
+	srv := newTestServer(t, &logs)
+
+	// Create room
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/rooms", strings.NewReader("title=My+Session"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	srv.ServeHTTP(rec, req)
+	if rec.Code != http.StatusSeeOther {
+		t.Fatalf("create status: %d", rec.Code)
+	}
+	lobby := rec.Header().Get("Location")
+
+	// Join
+	rec2 := httptest.NewRecorder()
+	req2 := httptest.NewRequest("POST", strings.Replace(lobby, "/lobby", "/join", 1), strings.NewReader("name=Bob"))
+	req2.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	srv.ServeHTTP(rec2, req2)
+	if rec2.Code != http.StatusSeeOther {
+		t.Fatalf("join status: %d", rec2.Code)
+	}
+	roomURL := rec2.Header().Get("Location")
+	setCookie := rec2.Header().Get("Set-Cookie")
+	if setCookie == "" || !strings.Contains(setCookie, "pid=") {
+		t.Fatalf("expected pid cookie, got: %q", setCookie)
+	}
+
+	// Initially, 0 of 1 have voted and icon for current user is highlighted
+	rec3 := httptest.NewRecorder()
+	req3 := httptest.NewRequest("GET", roomURL, nil)
+	req3.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(rec3, req3)
+	if rec3.Code != 200 {
+		t.Fatalf("room status: %d", rec3.Code)
+	}
+	if !strings.Contains(rec3.Body.String(), "0 of 1 players have voted") {
+		t.Fatalf("expected initial voted count, got: %q", rec3.Body.String())
+	}
+	if !strings.Contains(rec3.Body.String(), "has-text-primary") {
+		t.Fatalf("expected current user icon highlighted, got: %q", rec3.Body.String())
+	}
+
+	// Trying to access lobby again should redirect to room (prevent re-join)
+	recLobby := httptest.NewRecorder()
+	reqLobby := httptest.NewRequest("GET", strings.Replace(roomURL, "/rooms/", "/rooms/", 1)+"/lobby", nil)
+	reqLobby.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(recLobby, reqLobby)
+	if recLobby.Code != http.StatusSeeOther {
+		t.Fatalf("expected redirect from lobby when already joined, got: %d", recLobby.Code)
+	}
+
+	// Cast a vote: 5
+	rec4 := httptest.NewRecorder()
+	castURL := roomURL + "/cast"
+	req4 := httptest.NewRequest("POST", castURL, strings.NewReader("card=5"))
+	req4.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req4.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(rec4, req4)
+	if rec4.Code != http.StatusSeeOther {
+		t.Fatalf("cast status: %d", rec4.Code)
+	}
+
+	// Back to room, now 1 of 1 voted
+	rec5 := httptest.NewRecorder()
+	req5 := httptest.NewRequest("GET", roomURL, nil)
+	req5.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(rec5, req5)
+	if !strings.Contains(rec5.Body.String(), "1 of 1 players have voted") {
+		t.Fatalf("expected voted count 1/1, got: %q", rec5.Body.String())
+	}
+
+	// Clear vote
+	rec6 := httptest.NewRecorder()
+	req6 := httptest.NewRequest("POST", roomURL+"/clear", nil)
+	req6.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(rec6, req6)
+	if rec6.Code != http.StatusSeeOther {
+		t.Fatalf("clear status: %d", rec6.Code)
+	}
+
+	rec7 := httptest.NewRecorder()
+	req7 := httptest.NewRequest("GET", roomURL, nil)
+	req7.Header.Set("Cookie", setCookie)
+	srv.ServeHTTP(rec7, req7)
+	if !strings.Contains(rec7.Body.String(), "0 of 1 players have voted") {
+		t.Fatalf("expected after clear 0/1, got: %q", rec7.Body.String())
+	}
+}
