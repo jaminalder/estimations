@@ -1,0 +1,38 @@
+run:
+  timeout: 3m
+  tests: true
+  go: "1.25"
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - ineffassign
+    - unused
+    - gosimple
+    - typecheck
+    - gofmt
+    - goimports
+    - gofumpt
+    - revive
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/jaminalder/estimations
+  revive:
+    rules:
+      - name: exported
+        disabled: true
+      - name: package-comments
+        disabled: true
+  gofumpt:
+    extra-rules: false
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  new: true

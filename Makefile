@@ -9,7 +9,7 @@ TESTFLAGS ?= -v
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 MSG  ?= $(if $(strip $(ARGS)),$(ARGS),update)
 
-.PHONY: run dev build test fmt tidy clean tools pushall
+.PHONY: run dev build test fmt lint tidy clean tools pushall
 
 run:
 	$(ENVVARS) $(GO) run $(GOFLAGS) ./cmd/server
@@ -28,6 +28,10 @@ fmt:
 	$(ENVVARS) $(GO) fmt $(GOFLAGS) ./...
 	$(ENVVARS) $(GO) vet $(GOFLAGS) ./...
 
+lint:
+	@command -v golangci-lint >/dev/null 2>&1 || { echo 'golangci-lint not found. Run: make tools'; exit 1; }
+	$(ENVVARS) GOLANGCI_LINT_CACHE=$(CURDIR)/tmp/golangci-cache XDG_CACHE_HOME=$(CURDIR)/tmp golangci-lint run
+
 tidy:
 	$(ENVVARS) $(GO) mod tidy $(GOFLAGS)
 
@@ -35,10 +39,16 @@ clean:
 	rm -rf bin tmp
 
 tools:
-	$(GO) install github.com/air-verse/air@latest
+	GOTOOLCHAIN=go1.25.0 $(GO) install github.com/air-verse/air@latest
+	GOTOOLCHAIN=go1.25.0 $(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	GOTOOLCHAIN=go1.25.0 $(GO) install mvdan.cc/gofumpt@latest
+	GOTOOLCHAIN=go1.25.0 $(GO) install golang.org/x/tools/cmd/goimports@latest
 
 # Add all changes, commit with optional message, then push
 pushall:
+	@echo "Running fmt and lint before push..."
+	@$(MAKE) fmt
+	@$(MAKE) lint
 	@echo "Commit message: '$(MSG)'"
 	@git add -A
 	@if git diff --cached --quiet; then \
